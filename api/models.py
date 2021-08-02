@@ -106,3 +106,7 @@ class Agreement(models.Model):
 
     class Meta:
         db_table = 'Agreements'
+
+    def __str__(self):
+        from django.core import serializers
+        return serializers.serialize('json', [self, ])

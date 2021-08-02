@@ -10,6 +10,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Company
         fields = '__all__'
@@ -28,4 +29,16 @@ class AgreementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Agreement
+        fields = '__all__'
+
+
+class RepresentativeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Representative
+        fields = '__all__'
+
+
+class AgreementTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AgreementType
         fields = '__all__'
