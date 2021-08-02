@@ -4,6 +4,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets
 
 from api.models import *
+from validators import validate_int
 from . import serializers
 
 
@@ -22,15 +23,17 @@ class CompanyView(viewsets.ModelViewSet):
     filter_fields = ['id_country']
 
     def get_queryset(self):
-        id_type = self.request.query_params.get('id_agreement_type', -1)
-        if id_type is not None and int(id_type) > 0:
-            return Company.objects.filter(partner__agreement__id_agr_type=id_type)
+        id_type = self.request.query_params.get('id_agreement_type')
+        id_delegate = self.request.query_params.get('id_delegate')
+        print(self.queryset)
+        if validate_int(id_delegate, min_value=0):
+            self.queryset = self.queryset.filter(partner__agreement__id_representative=id_delegate)
+        print(self.queryset)
+        if validate_int(id_type, min_value=0):
+            self.queryset = self.queryset.filter(partner__agreement__id_agr_type=id_type)
 
-        id_delegate = self.request.query_params.get('id_delegate', -1)
-        if id_delegate is not None and int(id_delegate) > 0:
-            return Company.objects.filter(partner__agreement__id_representative=id_delegate)
-
-        return self.queryset
+        print(self.queryset)
+        return self.queryset.distinct('id')
 
 
 class AgreementTypeView(viewsets.ModelViewSet):
