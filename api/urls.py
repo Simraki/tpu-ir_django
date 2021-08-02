@@ -7,6 +7,7 @@ from .views import *
 router = routers.DefaultRouter()
 router.register(r'countries', CountryView)
 router.register(r'companies', CompanyView)
+router.register(r'agreements', AgreementView)
 
 # urlpatterns = [
 #     path('', include(router.urls)),
