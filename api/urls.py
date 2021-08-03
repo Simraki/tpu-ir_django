@@ -8,7 +8,7 @@ router = routers.DefaultRouter()
 router.register(r'countries', CountryView)
 router.register(r'companies', CompanyView)
 router.register(r'agreements', AgreementView)
-router.register(r'delegates', RepresentativeView)
+router.register(r'representatives', RepresentativeView)
 router.register(r'agreement_types', AgreementTypeView)
 
 # urlpatterns = [

@@ -16,24 +16,21 @@ class CountryView(viewsets.ReadOnlyModelViewSet):
 @method_decorator(name='list',
                   decorator=extend_schema(parameters=[OpenApiParameter(name='id_country', type=OpenApiTypes.INT),
                                                       OpenApiParameter(name='id_agreement_type', type=OpenApiTypes.INT),
-                                                      OpenApiParameter(name='id_delegate', type=OpenApiTypes.INT)]))
+                                                      OpenApiParameter(name='id_representative', type=OpenApiTypes.INT)]))
 class CompanyView(viewsets.ModelViewSet):
-    queryset = Company.objects.all()
+    queryset = Company.objects.order_by('name')
     serializer_class = serializers.CompanySerializer
     filter_fields = ['id_country']
 
     def get_queryset(self):
         id_type = self.request.query_params.get('id_agreement_type')
-        id_delegate = self.request.query_params.get('id_delegate')
-        print(self.queryset)
-        if validate_int(id_delegate, min_value=0):
-            self.queryset = self.queryset.filter(partner__agreement__id_representative=id_delegate)
-        print(self.queryset)
+        id_representative = self.request.query_params.get('id_representative')
+        if validate_int(id_representative, min_value=0):
+            self.queryset = self.queryset.filter(partner__agreement__id_representative=id_representative)
         if validate_int(id_type, min_value=0):
             self.queryset = self.queryset.filter(partner__agreement__id_agr_type=id_type)
 
-        print(self.queryset)
-        return self.queryset.distinct('id')
+        return self.queryset.distinct()
 
 
 class AgreementTypeView(viewsets.ModelViewSet):
