@@ -27,9 +27,11 @@ SECRET_KEY = 'django-insecure-g*6x617(c_9yj+hmsy3@_@jm3*ajqmi%rz=-g^cw30=!rpxzhw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['tpu-international-backend.herokuapp.com']
+ALLOWED_HOSTS = ['tpu-international-backend.herokuapp.com', 'localhost']
 
-AUTH_USER_MODEL = 'authentication.User'
+AUTHENTICATION_BACKENDS = (
+    'authentication.backends.EmailAuthBackend',
+)
 
 # Application definition
 
@@ -61,10 +63,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'knox.auth.TokenAuthentication',
     ),
-}
-
-REST_KNOX = {
-    'AUTH_HEADER_PREFIX': 'Bearer',
 }
 
 # DRF-SPECTACULAR
