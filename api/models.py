@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.postgres import fields
 from django.db import models
 
@@ -63,6 +64,7 @@ class Representative(models.Model):
     email = models.CharField(max_length=100, null=True)
     phone = models.CharField(max_length=50, null=True)
     id_school = models.ForeignKey(EngineeringSchool, models.DO_NOTHING, db_column='id_school')
+    id_user = models.ForeignKey(get_user_model(), models.DO_NOTHING, db_column='id_user', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

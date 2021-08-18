@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
-import django_heroku
+
 import dj_database_url
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,20 +29,26 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['tpu-international-backend.herokuapp.com']
 
+AUTH_USER_MODEL = 'authentication.User'
+
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api.apps.ApiConfig',
+
     'rest_framework',
     'corsheaders',
     'drf_spectacular',
     'django_filters',
+    'knox',
+
+    'api.apps.ApiConfig',
+    'authentication.apps.AuthenticationConfig'
 ]
 
 # REST_FRAMEWORK
@@ -51,6 +58,13 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'knox.auth.TokenAuthentication',
+    ),
+}
+
+REST_KNOX = {
+    'AUTH_HEADER_PREFIX': 'Bearer',
 }
 
 # DRF-SPECTACULAR
@@ -106,20 +120,31 @@ WSGI_APPLICATION = 'tpu_ir.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # TODO: PASSWORD
-db_from_env = dj_database_url.config()
+# db_from_env = dj_database_url.config()
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'db0pqciequoef3',
+#         'USER': 'dwmhlhbhiklgsf',
+#         'PASSWORD': '35fbc0d93849cf1be6f4c484aa6ba923f9f3eb24ef496dc8e5eca03448bc28aa',
+#         'HOST': 'ec2-34-252-251-16.eu-west-1.compute.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db0pqciequoef3',
-        'USER': 'dwmhlhbhiklgsf',
-        'PASSWORD': '35fbc0d93849cf1be6f4c484aa6ba923f9f3eb24ef496dc8e5eca03448bc28aa',
-        'HOST': 'ec2-34-252-251-16.eu-west-1.compute.amazonaws.com',
+        'NAME': 'test',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
 
-DATABASES['default'].update(db_from_env)
+# DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
