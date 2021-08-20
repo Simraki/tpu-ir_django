@@ -3,15 +3,45 @@ from django.contrib.postgres import fields
 from django.db import models
 
 
+# Reference tables
+
+class AgreementType(models.Model):
+    name = models.CharField(max_length=200)
+
+    class Meta:
+        db_table = 'AgreementTypes'
+
+
+class EngineeringSchool(models.Model):
+    name = models.CharField(max_length=200)
+
+    class Meta:
+        db_table = 'EngineeringSchools'
+
+
+class ResearchDomain(models.Model):
+    name = models.CharField(max_length=200)
+
+    class Meta:
+        db_table = 'ResearchDomains'
+
+
 class Country(models.Model):
     name = models.CharField(max_length=200)
     code = models.CharField(max_length=10)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'Countries'
 
+
+class Status(models.Model):
+    name = models.CharField(max_length=300)
+
+    class Meta:
+        db_table = 'Status'
+
+
+# Operated models tables
 
 class Company(models.Model):
     name = models.CharField(max_length=500)
@@ -23,15 +53,6 @@ class Company(models.Model):
 
     class Meta:
         db_table = 'Companies'
-
-
-class AgreementType(models.Model):
-    name = models.CharField(max_length=200)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'AgreementTypes'
 
 
 class Partner(models.Model):
@@ -46,15 +67,6 @@ class Partner(models.Model):
 
     class Meta:
         db_table = 'Partners'
-
-
-class EngineeringSchool(models.Model):
-    name = models.CharField(max_length=200)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'EngineeringSchools'
 
 
 class Representative(models.Model):
@@ -72,24 +84,6 @@ class Representative(models.Model):
         db_table = 'Representatives'
 
 
-class ResearchDomain(models.Model):
-    name = models.CharField(max_length=200)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'ResearchDomains'
-
-
-class Status(models.Model):
-    name = models.CharField(max_length=300)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'Status'
-
-
 class Agreement(models.Model):
     name = models.CharField(max_length=200)
     start_date = models.DateField()
@@ -97,9 +91,9 @@ class Agreement(models.Model):
     news_url = models.TextField(null=True)
     comments = models.TextField(null=True)
     id_agr_type = models.ForeignKey(AgreementType, models.DO_NOTHING,
-                                    db_column='id_agrType')
+                                    db_column='id_agr_type')
     id_research_domain = models.ForeignKey(ResearchDomain, models.DO_NOTHING,
-                                           db_column='id_researchDomain')
+                                           db_column='id_research_domain')
     id_representative = models.ForeignKey(Representative, models.DO_NOTHING, db_column='id_representative')
     id_partner = models.ForeignKey(Partner, models.DO_NOTHING, db_column='id_partner')
     id_status = models.ForeignKey(Status, models.DO_NOTHING, db_column='id_status')
@@ -109,6 +103,6 @@ class Agreement(models.Model):
     class Meta:
         db_table = 'Agreements'
 
-    def __str__(self):
-        from django.core import serializers
-        return serializers.serialize('json', [self, ])
+    # def __str__(self):
+    #     from django.core import serializers
+    #     return serializers.serialize('json', [self, ])
