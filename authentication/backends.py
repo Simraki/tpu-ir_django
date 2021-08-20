@@ -1,15 +1,16 @@
+from django.utils import timezone
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.models import User
+
+from authentication.models import User
 
 
 class EmailAuthBackend(ModelBackend):
-    def authenticate(self, username=None, password=None, **kwargs):
+    def authenticate(self, email=None, password=None, **kwargs):
         try:
-            user = User.objects.get(username=username)
+            user = User.objects.get(email=email)
             if user.check_password(password):
+                user.last_login = timezone.now()
+                user.save(update_fields=['last_login'])
                 return user
         except User.DoesNotExist:
-            # Run the default password hasher once to reduce the timing
-            # difference between an existing and a non-existing user (#20760).
-            # User().set_password(password)
             return None
