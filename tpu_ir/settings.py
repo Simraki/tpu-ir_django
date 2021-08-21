@@ -91,27 +91,27 @@ WSGI_APPLICATION = 'tpu_ir.wsgi.application'
 # TODO: PASSWORD
 # db_from_env = dj_database_url.config()
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'db0pqciequoef3',
-#         'USER': 'dwmhlhbhiklgsf',
-#         'PASSWORD': '35fbc0d93849cf1be6f4c484aa6ba923f9f3eb24ef496dc8e5eca03448bc28aa',
-#         'HOST': 'ec2-34-252-251-16.eu-west-1.compute.amazonaws.com',
-#         'PORT': '5432',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': 'localhost',
+        'NAME': 'db0pqciequoef3',
+        'USER': 'dwmhlhbhiklgsf',
+        'PASSWORD': '35fbc0d93849cf1be6f4c484aa6ba923f9f3eb24ef496dc8e5eca03448bc28aa',
+        'HOST': 'ec2-34-252-251-16.eu-west-1.compute.amazonaws.com',
         'PORT': '5432',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'test',
+#         'USER': 'postgres',
+#         'PASSWORD': '',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 # DATABASES['default'].update(db_from_env)
 

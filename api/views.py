@@ -9,7 +9,7 @@ from . import serializers
 
 
 class CountryView(viewsets.ReadOnlyModelViewSet):
-    queryset = Country.objects.order_by('name')
+    queryset = Country.objects.all()
     serializer_class = serializers.CountrySerializer
 
 
@@ -18,7 +18,7 @@ class CountryView(viewsets.ReadOnlyModelViewSet):
                                                       OpenApiParameter(name='id_agreement_type', type=OpenApiTypes.INT),
                                                       OpenApiParameter(name='id_representative', type=OpenApiTypes.INT)]))
 class CompanyView(viewsets.ModelViewSet):
-    queryset = Company.objects.order_by('name')
+    queryset = Company.objects.all()
     serializer_class = serializers.CompanySerializer
     filter_fields = ['id_country']
 
@@ -26,9 +26,9 @@ class CompanyView(viewsets.ModelViewSet):
         id_type = self.request.query_params.get('id_agreement_type')
         id_representative = self.request.query_params.get('id_representative')
         if validate_int(id_representative, min_value=0):
-            self.queryset = self.queryset.filter(partner__agreement__id_representative=id_representative)
+            self.queryset = self.queryset.filter(partner__agreement__representative_id=id_representative)
         if validate_int(id_type, min_value=0):
-            self.queryset = self.queryset.filter(partner__agreement__id_agr_type=id_type)
+            self.queryset = self.queryset.filter(partner__agreement__agr_type_id=id_type)
 
         return self.queryset.distinct()
 
@@ -41,13 +41,13 @@ class AgreementTypeView(viewsets.ModelViewSet):
 @method_decorator(name='list',
                   decorator=extend_schema(parameters=[OpenApiParameter(name='id_company', type=OpenApiTypes.INT)]))
 class AgreementView(viewsets.ModelViewSet):
-    queryset = Agreement.objects.order_by('start_date')
+    queryset = Agreement.objects.all()
     serializer_class = serializers.AgreementSerializer
 
     def get_queryset(self):
         id_company = self.request.query_params.get('id_company')
         if id_company is not None and int(id_company) > 0:
-            return self.queryset.filter(id_partner__id_company=id_company).order_by('start_date')
+            return self.queryset.filter(partner__company_id=id_company).all()
         return self.queryset
 
 

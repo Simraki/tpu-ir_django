@@ -32,6 +32,7 @@ class Country(models.Model):
 
     class Meta:
         db_table = 'Countries'
+        ordering = ['name']
 
 
 class Status(models.Model):
@@ -53,11 +54,12 @@ class Company(models.Model):
 
     class Meta:
         db_table = 'Companies'
+        ordering = ['name']
 
 
 class Partner(models.Model):
     first_name = models.CharField(max_length=100)
-    second_name = models.CharField(max_length=100)
+    second_name = models.CharField(max_length=100, blank=True, default='')
     third_name = models.CharField(max_length=100, blank=True, default='')
     email = models.EmailField(max_length=100, blank=True, default='')
     phone = models.CharField(max_length=50, blank=True, default='')
@@ -100,6 +102,7 @@ class Agreement(models.Model):
 
     class Meta:
         db_table = 'Agreements'
+        ordering = ['start_date']
 
     # def __str__(self):
     #     from django.core import serializers
