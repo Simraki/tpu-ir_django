@@ -14,9 +14,9 @@ class CountryView(viewsets.ReadOnlyModelViewSet):
 
 
 @method_decorator(name='list',
-                  decorator=extend_schema(parameters=[OpenApiParameter(name='id_country', type=OpenApiTypes.INT,
+                  decorator=extend_schema(parameters=[OpenApiParameter(name='id_country', type=OpenApiTypes.INT),
+                                                      OpenApiParameter(name='id_agreement_type', type=OpenApiTypes.INT,
                                                                        description="Может принимать более одного значения через запятую"),
-                                                      OpenApiParameter(name='id_agreement_type', type=OpenApiTypes.INT),
                                                       OpenApiParameter(name='id_representative',
                                                                        type=OpenApiTypes.INT)]))
 class CompanyView(viewsets.ModelViewSet):
