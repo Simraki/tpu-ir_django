@@ -47,7 +47,7 @@ class Status(models.Model):
 class Company(models.Model):
     name = models.CharField(max_length=500)
     website = models.CharField(max_length=2048, blank=True, default='')
-    country = models.ForeignKey(Country, models.DO_NOTHING)
+    id_country = models.ForeignKey(Country, models.DO_NOTHING, db_column='id_country')
     location = fields.ArrayField(models.FloatField(), size=2, default=list)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -63,7 +63,7 @@ class Partner(models.Model):
     third_name = models.CharField(max_length=100, blank=True, default='')
     email = models.EmailField(max_length=100, blank=True, default='')
     phone = models.CharField(max_length=50, blank=True, default='')
-    company = models.ForeignKey(Company, models.DO_NOTHING)
+    id_company = models.ForeignKey(Company, models.DO_NOTHING, db_column='id_company')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -77,8 +77,8 @@ class Representative(models.Model):
     third_name = models.CharField(max_length=100, blank=True, default='')
     email = models.EmailField(max_length=100, blank=True, default='')
     phone = models.CharField(max_length=50, blank=True, default='')
-    school = models.ForeignKey(EngineeringSchool, models.DO_NOTHING)
-    user = models.ForeignKey(get_user_model(), models.DO_NOTHING, null=True)
+    id_school = models.ForeignKey(EngineeringSchool, models.DO_NOTHING, db_column='id_school')
+    id_user = models.ForeignKey(get_user_model(), models.DO_NOTHING, db_column='id_user', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -92,11 +92,13 @@ class Agreement(models.Model):
     end_date = models.DateField(null=True)
     news_url = fields.ArrayField(models.CharField(max_length=2048), default=list)
     comments = fields.ArrayField(models.CharField(max_length=2048), default=list)
-    agr_type = models.ForeignKey(AgreementType, models.DO_NOTHING)
-    research_domain = models.ForeignKey(ResearchDomain, models.DO_NOTHING)
-    representative = models.ForeignKey(Representative, models.DO_NOTHING)
-    partner = models.ForeignKey(Partner, models.DO_NOTHING)
-    status = models.ForeignKey(Status, models.DO_NOTHING)
+    id_agr_type = models.ForeignKey(AgreementType, models.DO_NOTHING,
+                                    db_column='id_agr_type')
+    id_research_domain = models.ForeignKey(ResearchDomain, models.DO_NOTHING,
+                                           db_column='id_research_domain')
+    id_representative = models.ForeignKey(Representative, models.DO_NOTHING, db_column='id_representative')
+    id_partner = models.ForeignKey(Partner, models.DO_NOTHING, db_column='id_partner')
+    id_status = models.ForeignKey(Status, models.DO_NOTHING, db_column='id_status')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

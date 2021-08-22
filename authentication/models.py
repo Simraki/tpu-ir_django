@@ -18,7 +18,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True)
-    user_type = models.ForeignKey(UserType, models.DO_NOTHING)
+    id_user_type = models.ForeignKey(UserType, models.DO_NOTHING, db_column='id_user_type')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
