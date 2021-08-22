@@ -20,3 +20,10 @@ def validate_int(value, min_value=None, max_value=None, required=False):
         raise ValueError(f"expected value greater than {max_value}, but got {value}")
 
     return True
+
+
+def validate_list_int(values, min_value=None, max_value=None, required=False):
+    for value in values:
+        validate_int(value, min_value, max_value, required)
+
+    return True
