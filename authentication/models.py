@@ -10,6 +10,7 @@ class UserType(models.Model):
 
     class Meta:
         db_table = 'UserTypes'
+        ordering = ['name']
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -29,3 +30,4 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = 'Users'
+        ordering = ['email']

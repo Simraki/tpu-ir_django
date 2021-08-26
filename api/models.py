@@ -10,6 +10,7 @@ class AgreementType(models.Model):
 
     class Meta:
         db_table = 'AgreementTypes'
+        ordering = ['name']
 
 
 class EngineeringSchool(models.Model):
@@ -17,6 +18,7 @@ class EngineeringSchool(models.Model):
 
     class Meta:
         db_table = 'EngineeringSchools'
+        ordering = ['name']
 
 
 class ResearchDomain(models.Model):
@@ -24,6 +26,7 @@ class ResearchDomain(models.Model):
 
     class Meta:
         db_table = 'ResearchDomains'
+        ordering = ['name']
 
 
 class Country(models.Model):
@@ -40,6 +43,7 @@ class Status(models.Model):
 
     class Meta:
         db_table = 'Status'
+        ordering = ['name']
 
 
 # Operated models tables
@@ -69,6 +73,7 @@ class Partner(models.Model):
 
     class Meta:
         db_table = 'Partners'
+        ordering = ['second_name']
 
 
 class Representative(models.Model):
@@ -84,6 +89,7 @@ class Representative(models.Model):
 
     class Meta:
         db_table = 'Representatives'
+        ordering = ['second_name']
 
 
 class Agreement(models.Model):
