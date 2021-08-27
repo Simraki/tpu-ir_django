@@ -1,5 +1,5 @@
 def validate_int(value, min_value=None, max_value=None, required=False):
-    if value is None:
+    if not value:
         if required:
             raise TypeError('required value is None')
         return
@@ -23,6 +23,11 @@ def validate_int(value, min_value=None, max_value=None, required=False):
 
 
 def validate_list_int(values, min_value=None, max_value=None, required=False):
+    if not values:
+        if required:
+            raise TypeError('required value is None')
+        return
+
     for value in values:
         validate_int(value, min_value, max_value, required)
 

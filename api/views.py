@@ -25,8 +25,11 @@ class CompanyView(viewsets.ModelViewSet):
     filter_fields = ['id_country']
 
     def get_queryset(self):
-        list_id_types = self.request.query_params.get('id_agreement_type').split(',')
+        list_id_types = self.request.query_params.get('id_agreement_type')
+        list_id_types = list_id_types.split(',') if list_id_types else None
+
         id_representative = self.request.query_params.get('id_representative')
+
         if validate_int(id_representative, min_value=0):
             self.queryset = self.queryset.filter(partner__agreement__id_representative=id_representative)
         if validate_list_int(list_id_types, min_value=0):
