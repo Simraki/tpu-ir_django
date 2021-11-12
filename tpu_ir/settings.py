@@ -1,9 +1,9 @@
 import os
-import dotenv
 from pathlib import Path
 
 import dj_database_url
 import django_heroku
+import dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +20,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['tpu-international-backend.herokuapp.com', 'localhost']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'tpu-international-backend.herokuapp.com']
 
 AUTH_USER_MODEL = 'authentication.User'
 AUTHENTICATION_BACKENDS = [
@@ -81,6 +81,21 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+            ],
+        },
+    },
+]
+
 ROOT_URLCONF = 'tpu_ir.urls'
 
 WSGI_APPLICATION = 'tpu_ir.wsgi.application'
@@ -92,28 +107,9 @@ WSGI_APPLICATION = 'tpu_ir.wsgi.application'
 # db_from_env = dj_database_url.config()
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db0pqciequoef3',
-        'USER': 'dwmhlhbhiklgsf',
-        'PASSWORD': '35fbc0d93849cf1be6f4c484aa6ba923f9f3eb24ef496dc8e5eca03448bc28aa',
-        'HOST': 'ec2-34-252-251-16.eu-west-1.compute.amazonaws.com',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config()
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'test',
-#         'USER': 'postgres',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-
-# DATABASES['default'].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -146,23 +142,18 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+PROJECT_ROOT = os.path.join(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+STATIC_URL = '/static/'
+
+# Extra lookup directories for collectstatic to find static files
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+)
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -178,3 +169,5 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 django_heroku.settings(locals())
+if os.environ.get('ENV') == 'development':
+    del DATABASES['default']['OPTIONS']['sslmode']

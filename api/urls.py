@@ -1,5 +1,3 @@
-from django.urls import path, include
-from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import routers
 
 from .views import *
@@ -10,12 +8,6 @@ router.register(r'companies', CompanyView)
 router.register(r'agreements', AgreementView)
 router.register(r'representatives', RepresentativeView)
 router.register(r'agreement_types', AgreementTypeView)
-
-# urlpatterns = [
-#     path('', include(router.urls)),
-#     # path('countries/', CountryView.as_view()),
-# ]
+router.register(r'kpi', KPIView, basename='kpi')
 
 urlpatterns = router.urls
-
-# urlpatterns = format_suffix_patterns(urlpatterns)

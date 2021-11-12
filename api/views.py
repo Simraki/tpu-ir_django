@@ -1,16 +1,16 @@
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
-from drf_spectacular.openapi import OpenApiTypes, OpenApiParameter
+from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets
 
-from api.models import *
 from validators import *
-from . import serializers
+from .serializers import *
 
 
 class CountryView(viewsets.ReadOnlyModelViewSet):
     queryset = Country.objects.all()
-    serializer_class = serializers.CountrySerializer
+    serializer_class = CountrySerializer
 
 
 @method_decorator(name='list',
@@ -21,7 +21,7 @@ class CountryView(viewsets.ReadOnlyModelViewSet):
                                                                        type=OpenApiTypes.INT)]))
 class CompanyView(viewsets.ModelViewSet):
     queryset = Company.objects.all()
-    serializer_class = serializers.CompanySerializer
+    serializer_class = CompanySerializer
     filter_fields = ['id_country']
 
     def get_queryset(self):
@@ -40,14 +40,14 @@ class CompanyView(viewsets.ModelViewSet):
 
 class AgreementTypeView(viewsets.ModelViewSet):
     queryset = AgreementType.objects.all()
-    serializer_class = serializers.AgreementTypeSerializer
+    serializer_class = AgreementTypeSerializer
 
 
 @method_decorator(name='list',
                   decorator=extend_schema(parameters=[OpenApiParameter(name='id_company', type=OpenApiTypes.INT)]))
 class AgreementView(viewsets.ModelViewSet):
     queryset = Agreement.objects.all()
-    serializer_class = serializers.AgreementSerializer
+    serializer_class = AgreementSerializer
 
     def get_queryset(self):
         id_company = self.request.query_params.get('id_company')
@@ -58,4 +58,18 @@ class AgreementView(viewsets.ModelViewSet):
 
 class RepresentativeView(viewsets.ModelViewSet):
     queryset = Representative.objects.all()
-    serializer_class = serializers.RepresentativeSerializer
+    serializer_class = RepresentativeSerializer
+
+
+class KPIView(viewsets.GenericViewSet):
+
+    def list(self, request):
+        payload = {
+            "countries_num": Country.objects.filter(company__partner__agreement__isnull=False).order_by(
+                    'id').distinct().count(),
+            "annual_agreements_num": Agreement.objects.filter(start_date__year=2021).count(),
+            "companies_num": Company.objects.count(),
+            "researches_num": Agreement.objects.filter(id_agr_type=4).count()
+        }
+
+        return JsonResponse(payload, status=200)
