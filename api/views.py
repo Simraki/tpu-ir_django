@@ -22,7 +22,13 @@ class CountryView(viewsets.ReadOnlyModelViewSet):
                                                       OpenApiParameter(name='id_agreement_type', type=OpenApiTypes.INT,
                                                                        description="Может принимать более одного значения через запятую"),
                                                       OpenApiParameter(name='id_representative',
-                                                                       type=OpenApiTypes.INT)]))
+                                                                       type=OpenApiTypes.INT),
+                                                      OpenApiParameter(name='id_school',
+                                                                       type=OpenApiTypes.INT),
+                                                      OpenApiParameter(name='state',
+                                                                       type=OpenApiTypes.STR,
+                                                                       enum=['active', 'expired', 'expiringSoon']),
+                                                      ]))
 class CompanyView(viewsets.ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
@@ -47,7 +53,7 @@ class CompanyView(viewsets.ModelViewSet):
         elif str_state == 'expiringsoon':
             self.queryset = self.queryset.filter(
                     partner__agreement__end_date__range=[now, now + timedelta(days=182)])
-        else:
+        elif str_state is not None:
             raise ValueError("The state can only be Active, Expired and ExpiringSoon")
 
         if validate_int(id_representative, min_value=0):
