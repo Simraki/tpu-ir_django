@@ -1,4 +1,8 @@
+from datetime import timedelta
+
+from django.db.models import Q
 from django.http import JsonResponse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 from drf_spectacular.utils import extend_schema
@@ -29,11 +33,29 @@ class CompanyView(viewsets.ModelViewSet):
         list_id_types = list_id_types.split(',') if list_id_types else None
 
         id_representative = self.request.query_params.get('id_representative')
+        id_school = self.request.query_params.get('id_school')
+        str_state = self.request.query_params.get('state')
+
+        now = timezone.now()
+        if str_state is not None:
+            str_state = str_state.lower()
+        if str_state == 'active':
+            self.queryset = self.queryset.filter(
+                    Q(partner__agreement__end_date__isnull=True) | Q(partner__agreement__end_date__lte=now))
+        elif str_state == 'expired':
+            self.queryset = self.queryset.filter(partner__agreement__end_date__gt=now)
+        elif str_state == 'expiringsoon':
+            self.queryset = self.queryset.filter(
+                    partner__agreement__end_date__range=[now, now + timedelta(days=182)])
+        else:
+            raise ValueError("The state can only be Active, Expired and ExpiringSoon")
 
         if validate_int(id_representative, min_value=0):
             self.queryset = self.queryset.filter(partner__agreement__id_representative=id_representative)
         if validate_list_int(list_id_types, min_value=0):
             self.queryset = self.queryset.filter(partner__agreement__id_agr_type__in=list_id_types)
+        if validate_int(id_school, min_value=0):
+            self.queryset = self.queryset.filter(partner__agreement__id_representative__id_school=id_school)
 
         return self.queryset.distinct()
 
