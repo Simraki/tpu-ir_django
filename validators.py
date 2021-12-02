@@ -32,3 +32,24 @@ def validate_list_int(values, min_value=None, max_value=None, required=False):
         validate_int(value, min_value, max_value, required)
 
     return True
+
+
+def validate_list_enum(values, enum, case_sensitivity=False, required=False):
+    if not values:
+        if required:
+            raise TypeError('required value is None')
+        return
+
+    for value in values:
+        check = False
+        for en in enum:
+            if case_sensitivity and value == en:
+                check = True
+                break
+            elif value.lower() == en.lower():
+                check = True
+                break
+        if not check:
+            raise ValueError(f"{value} is not in {', '.join(enum)}")
+
+    return True

@@ -38,24 +38,51 @@ class CompanyView(viewsets.ModelViewSet):
         list_id_types = self.request.query_params.get('id_agreement_type')
         list_id_types = list_id_types.split(',') if list_id_types else None
 
+        list_state = self.request.query_params.get('state')
+        list_state = list_state.split(',') if list_state else None
+
         id_representative = self.request.query_params.get('id_representative')
         id_school = self.request.query_params.get('id_school')
-        str_state = self.request.query_params.get('state')
 
         now = timezone.now()
-        if str_state is not None:
-            str_state = str_state.lower()
-        if str_state == 'active':
-            self.queryset = self.queryset.filter(
-                    Q(partner__agreement__end_date__isnull=True) | Q(partner__agreement__end_date__lte=now))
-        elif str_state == 'expired':
-            self.queryset = self.queryset.filter(partner__agreement__end_date__gt=now)
-        elif str_state == 'expiringsoon':
-            self.queryset = self.queryset.filter(
-                    partner__agreement__end_date__range=[now, now + timedelta(days=182)])
-        elif str_state is not None:
-            raise ValueError("The state can only be Active, Expired and ExpiringSoon")
 
+        # if str_state is not None:
+        #     str_state = str_state.lower()
+        # if str_state == 'active':
+        #     self.queryset = self.queryset.filter(
+        #             Q(partner__agreement__end_date__isnull=True) | Q(partner__agreement__end_date__lte=now))
+        # elif str_state == 'expired':
+        #     self.queryset = self.queryset.filter(partner__agreement__end_date__gt=now)
+        # elif str_state == 'expiringsoon':
+        #     self.queryset = self.queryset.filter(
+        #             partner__agreement__end_date__range=[now, now + timedelta(days=182)])
+        # elif str_state is not None:
+        #     raise ValueError("The state can only be Active, Expired and ExpiringSoon")
+
+        allowed_state = ['Active', 'Expired', 'ExpiringSoon']
+        if validate_list_enum(list_state, allowed_state):
+            hopper = None
+            for state in list_state:
+                state = state.lower()
+                if state == 'active':
+                    if hopper is None:
+                        hopper = Q(partner__agreement__end_date__isnull=True) | Q(partner__agreement__end_date__lte=now)
+                    else:
+                        hopper = hopper | \
+                                 Q(partner__agreement__end_date__isnull=True) | \
+                                 Q(partner__agreement__end_date__lte=now)
+                elif state == 'expired':
+                    if hopper is None:
+                        hopper = Q(partner__agreement__end_date__gt=now)
+                    else:
+                        hopper = hopper | Q(partner__agreement__end_date__gt=now)
+                elif state == 'expiringsoon':
+                    if hopper is None:
+                        hopper = Q(partner__agreement__end_date__range=[now, now + timedelta(days=182)])
+                    else:
+                        hopper = hopper | Q(partner__agreement__end_date__range=[now, now + timedelta(days=182)])
+
+            self.queryset = self.queryset.filter(hopper)
         if validate_int(id_representative, min_value=0):
             self.queryset = self.queryset.filter(partner__agreement__id_representative=id_representative)
         if validate_list_int(list_id_types, min_value=0):
