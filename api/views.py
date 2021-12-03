@@ -161,4 +161,4 @@ class CompanyTimelineView(generics.ListAPIView):
 
         data = self.get_serializer(queryset, many=True).data
 
-        return JsonResponse(data, status=200)
+        return JsonResponse(data, status=200, safe=False)
