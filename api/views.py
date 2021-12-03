@@ -133,8 +133,7 @@ class KPIView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         payload = {
-            "countries_num": Country.objects.filter(company__partner__agreement__isnull=False).order_by(
-                    'id').distinct().count(),
+            "countries_num": Country.objects.filter(company__partner__agreement__isnull=False).distinct().count(),
             "annual_agreements_num": Agreement.objects.filter(start_date__year=2021).count(),
             "companies_num": Company.objects.count(),
             "researches_num": Agreement.objects.filter(id_agr_type=4).count()
