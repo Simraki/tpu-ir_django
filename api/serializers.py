@@ -29,6 +29,12 @@ class RepresentativeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class EngineeringSchoolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EngineeringSchool
+        fields = '__all__'
+
+
 class AgreementTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AgreementType
@@ -44,3 +50,17 @@ class AgreementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Agreement
         fields = '__all__'
+
+
+class KPISerializer(serializers.Serializer):
+    countries_num = serializers.IntegerField(min_value=0)
+    annual_agreements_num = serializers.IntegerField(min_value=0)
+    companies_num = serializers.IntegerField(min_value=0)
+    researches_num = serializers.IntegerField(min_value=0)
+
+
+class CompanyTimelineSerializer(serializers.Serializer):
+    id_agreement = serializers.IntegerField(min_value=0)
+    agr_type_name = serializers.CharField(max_length=200)
+    is_valid = serializers.BooleanField()
+    end_date = serializers.DateField()

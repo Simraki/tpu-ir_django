@@ -1,22 +1,28 @@
 from datetime import timedelta
 
-from django.db.models import Q
+from django.db.models import BooleanField, Case, F, Q, Value, When
 from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets
+from rest_framework import generics, viewsets
 
 from validators import *
 from .serializers import *
 
 
+#
+#   Country
+#
 class CountryView(viewsets.ReadOnlyModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
 
+#
+#   Company
+#
 @method_decorator(name='list',
                   decorator=extend_schema(parameters=[OpenApiParameter(name='id_country', type=OpenApiTypes.INT),
                                                       OpenApiParameter(name='id_agreement_type', type=OpenApiTypes.INT,
@@ -44,38 +50,24 @@ class CompanyView(viewsets.ModelViewSet):
         id_representative = self.request.query_params.get('id_representative')
         id_school = self.request.query_params.get('id_school')
 
-        now = timezone.now()
-
-        # if str_state is not None:
-        #     str_state = str_state.lower()
-        # if str_state == 'active':
-        #     self.queryset = self.queryset.filter(
-        #             Q(partner__agreement__end_date__isnull=True) | Q(partner__agreement__end_date__lte=now))
-        # elif str_state == 'expired':
-        #     self.queryset = self.queryset.filter(partner__agreement__end_date__gt=now)
-        # elif str_state == 'expiringsoon':
-        #     self.queryset = self.queryset.filter(
-        #             partner__agreement__end_date__range=[now, now + timedelta(days=182)])
-        # elif str_state is not None:
-        #     raise ValueError("The state can only be Active, Expired and ExpiringSoon")
-
         allowed_state = ['Active', 'Expired', 'ExpiringSoon']
         if validate_list_enum(list_state, allowed_state):
+            now = timezone.now()
             hopper = None
             for state in list_state:
                 state = state.lower()
                 if state == 'active':
                     if hopper is None:
-                        hopper = Q(partner__agreement__end_date__isnull=True) | Q(partner__agreement__end_date__lte=now)
+                        hopper = Q(partner__agreement__end_date__isnull=True) | Q(partner__agreement__end_date__gte=now)
                     else:
                         hopper = hopper | \
                                  Q(partner__agreement__end_date__isnull=True) | \
-                                 Q(partner__agreement__end_date__lte=now)
+                                 Q(partner__agreement__end_date__gte=now)
                 elif state == 'expired':
                     if hopper is None:
-                        hopper = Q(partner__agreement__end_date__gt=now)
+                        hopper = Q(partner__agreement__end_date__lt=now)
                     else:
-                        hopper = hopper | Q(partner__agreement__end_date__gt=now)
+                        hopper = hopper | Q(partner__agreement__end_date__lt=now)
                 elif state == 'expiringsoon':
                     if hopper is None:
                         hopper = Q(partner__agreement__end_date__range=[now, now + timedelta(days=182)])
@@ -93,11 +85,17 @@ class CompanyView(viewsets.ModelViewSet):
         return self.queryset.distinct()
 
 
+#
+#   Agreement Type
+#
 class AgreementTypeView(viewsets.ModelViewSet):
     queryset = AgreementType.objects.all()
     serializer_class = AgreementTypeSerializer
 
 
+#
+#   Agreement
+#
 @method_decorator(name='list',
                   decorator=extend_schema(parameters=[OpenApiParameter(name='id_company', type=OpenApiTypes.INT)]))
 class AgreementView(viewsets.ModelViewSet):
@@ -106,19 +104,34 @@ class AgreementView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         id_company = self.request.query_params.get('id_company')
-        if id_company is not None and int(id_company) > 0:
-            return self.queryset.filter(id_partner__id_company=id_company).all()
+        if validate_int(id_company, min_value=0):
+            self.queryset = self.queryset.filter(id_partner__id_company=id_company)
         return self.queryset
 
 
+#
+#   Representative
+#
 class RepresentativeView(viewsets.ModelViewSet):
     queryset = Representative.objects.all()
     serializer_class = RepresentativeSerializer
 
 
-class KPIView(viewsets.GenericViewSet):
+#
+#   Engineering School
+#
+class EngineeringSchoolView(viewsets.ModelViewSet):
+    queryset = EngineeringSchool.objects.all()
+    serializer_class = EngineeringSchoolSerializer
 
-    def list(self, request):
+
+#
+#   KPI
+#
+class KPIView(generics.ListAPIView):
+    serializer_class = KPISerializer
+
+    def list(self, request, *args, **kwargs):
         payload = {
             "countries_num": Country.objects.filter(company__partner__agreement__isnull=False).order_by(
                     'id').distinct().count(),
@@ -127,4 +140,26 @@ class KPIView(viewsets.GenericViewSet):
             "researches_num": Agreement.objects.filter(id_agr_type=4).count()
         }
 
-        return JsonResponse(payload, status=200)
+        data = self.get_serializer(payload).data
+
+        return JsonResponse(data, status=200)
+
+
+#
+#   Company Timeline
+#
+class CompanyTimelineView(generics.ListAPIView):
+    serializer_class = CompanyTimelineSerializer
+
+    def list(self, request, *args, **kwargs):
+        hopper = Q(end_date__isnull=True) | Q(end_date__gt=timezone.now())
+
+        queryset = Agreement.objects.filter(id_partner__id_company=kwargs['pk']).select_related('id_agr_type') \
+            .annotate(agr_type_name=F('id_agr_type__name'),
+                      is_valid=Case(When(hopper, then=Value(True)), default=Value(False),
+                                    output_field=BooleanField()),
+                      id_agreement=F('pk'))
+
+        data = self.get_serializer(queryset, many=True).data
+
+        return JsonResponse(data, status=200)

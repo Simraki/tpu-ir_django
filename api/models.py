@@ -15,6 +15,7 @@ class AgreementType(models.Model):
 
 class EngineeringSchool(models.Model):
     name = models.CharField(max_length=200)
+    full_name = models.CharField(max_length=200)
 
     class Meta:
         db_table = 'EngineeringSchools'
