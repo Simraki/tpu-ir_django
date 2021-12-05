@@ -155,10 +155,31 @@ class CompanyTimelineView(generics.ListAPIView):
 
         queryset = Agreement.objects.filter(id_partner__id_company=kwargs['pk']).select_related('id_agr_type') \
             .annotate(agr_type_name=F('id_agr_type__name'),
-                      is_valid=Case(When(hopper, then=Value(True)), default=Value(False),
-                                    output_field=BooleanField()),
-                      id_agreement=F('pk'))
+                      is_active=Case(When(hopper, then=Value(True)), default=Value(False),
+                                     output_field=BooleanField())
+                      )
 
-        data = self.get_serializer(queryset, many=True).data
+        output = []
+
+        for q in queryset:
+            output.append({
+                'id_agreement': q.pk,
+                'agr_type_name': q.agr_type_name,
+                'is_active': q.is_active,
+                'is_end_date': False,
+                'date': q.start_date
+            })
+            if q.end_date:
+                output.append({
+                    'id_agreement': q.pk,
+                    'agr_type_name': q.agr_type_name,
+                    'is_active': q.is_active,
+                    'is_end_date': True,
+                    'date': q.end_date
+                })
+
+        output.sort(key=lambda x: x['date'])
+
+        data = self.get_serializer(output, many=True).data
 
         return JsonResponse(data, status=200, safe=False)

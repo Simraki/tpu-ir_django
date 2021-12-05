@@ -62,5 +62,6 @@ class KPISerializer(serializers.Serializer):
 class CompanyTimelineSerializer(serializers.Serializer):
     id_agreement = serializers.IntegerField(min_value=0)
     agr_type_name = serializers.CharField(max_length=200)
-    is_valid = serializers.BooleanField()
-    end_date = serializers.DateField()
+    is_active = serializers.BooleanField()
+    is_end_date = serializers.BooleanField()
+    date = serializers.DateField()
